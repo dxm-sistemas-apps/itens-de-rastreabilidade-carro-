@@ -99,7 +99,7 @@
         <section class="w-full overflow-x-auto mb-4 max-sm:-mx-2 max-sm:w-[calc(100%+16px)]">
             <table class="w-full text-left border-collapse min-w-[320px]">
                 <thead>
-                    <tr class="bg-gray-800 text-white text-[10px] sm:text-xs uppercase">
+                    <tr class="bg-gray-800 text-white text-[9px] sm:text-xs uppercase">
                         <th class="p-1 sm:p-3 text-center w-8">N°</th>
                         <th class="p-1 sm:p-3">Peça</th>
                         <th class="p-1 sm:p-3 text-center w-15">Etiquetada</th>
@@ -109,7 +109,7 @@
                 </thead>
                 <tbody id="table-body" class="divide-y divide-gray-200 text-xs"></tbody>
                 <tfoot>
-                    <tr class="text-[10px] sm:text-xs text-gray-500 uppercase">
+                    <tr class="text-[9px] sm:text-xs text-gray-500 uppercase">
                         <td class="p-1 text-center" colspan="2"></td>
                         <td class="p-1 text-center">ETIQUETADA</td>
                         <td class="p-1 text-center">NÃO ETIQUETADA</td>
@@ -236,7 +236,7 @@ pecas.forEach((peca, index) => {
     const num = String(index + 1).padStart(2, '0');
     const row = document.createElement('tr');
     row.innerHTML = `<td class="p-1 sm:p-2 text-center font-mono text-gray-500 bg-gray-50 text-[11px] sm:text-sm">${num}</td>
-                     <td class="p-1 sm:p-2 font-medium text-gray-700 text-xs sm:text-sm truncate">${peca}</td>
+                     <td class="p-1 sm:p-2 font-medium text-gray-700 text-[10px] sm:text-sm truncate">${peca}</td>
                      <td class="p-1 sm:p-2 text-center"><input type="text" inputmode="numeric" pattern="[0-9]*" value="" oninput="this.value = this.value.replace(/[^0-9]/g, ''); calcularLinha(this)" onfocus="this.select()" class="input-etiquetada w-full sm:w-20 p-1 border border-gray-300 rounded text-center text-xs sm:text-sm"></td>
                      <td class="p-1 sm:p-2 text-center"><input type="text" inputmode="numeric" pattern="[0-9]*" value="" oninput="this.value = this.value.replace(/[^0-9]/g, ''); calcularLinha(this)" onfocus="this.select()" class="input-nao-etiquetada w-full sm:w-20 p-1 border border-gray-300 rounded text-center text-xs sm:text-sm"></td>
                      <td class="p-1 sm:p-2 text-center bg-gray-50"><input type="text" value="" disabled class="input-est-fisico w-full sm:w-20 p-1 border border-gray-200 rounded text-center font-semibold text-gray-700 bg-gray-100 cursor-not-allowed text-xs sm:text-sm"></td>`;
