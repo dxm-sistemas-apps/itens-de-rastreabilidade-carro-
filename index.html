@@ -383,7 +383,7 @@ function encerrarContagemAgregados() {
                     container.classList.add('ring-4', 'ring-red-600', 'transition-all');
                     setTimeout(() => {
                         container.classList.remove('ring-4', 'ring-amber-500');
-                    }, 1500);
+                    }, 1000);
                 }
             }
         });
@@ -599,7 +599,7 @@ function mostrarAlertaAviso(titulo, mensagemHTML, elementoParaFocar) {
                             elementoParaFocar.classList.remove('focus:ring-0', 'outline-none');
                             elementoParaFocar.focus({ preventScroll: true });
                         }
-                    }, 1500);
+                    }, 1000);
 
                 }, 150);
             }
