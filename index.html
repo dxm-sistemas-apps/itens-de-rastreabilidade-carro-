@@ -21,6 +21,29 @@
             canvas { height: 130px !important; }
             #bloco-agentes-detran { page-break-inside: avoid !important; }
             .container-agregados-classe { display: none !important; }
+
+            /* Alterações solicitadas para o PDF/Impressão */
+            .bloco-signature-container {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 16px !important;
+            }
+            #bloco-agentes-detran {
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: center !important;
+                width: 100% !important;
+                gap: 16px !important;
+            }
+            #bloco-agentes-detran .bloco-assinatura {
+                flex: 1 !important;
+                max-width: 48% !important;
+            }
+            #bloco-representante-empresa {
+                width: 50% !important;
+                margin: 0 auto !important;
+            }
         }
         canvas { touch-action: none; }
         input { text-transform: uppercase; }
@@ -172,7 +195,7 @@
                 </div>
             </div>
 
-            <div class="bloco-assinatura flex flex-col justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div id="bloco-representante-empresa" class="bloco-assinatura flex flex-col justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <div class="mb-3">
                     <label class="block text-xs font-bold uppercase text-black-500 mb-1">ASSINATURA DIGITAL:</label>
                     <canvas id="sig-empresa" class="w-full h-[170px] bg-white border border-dashed border-gray-400 rounded pointer-events-none"></canvas>
@@ -363,7 +386,6 @@ function encerrarContagemAgregados() {
 
     const temDados = Object.values(blocoDados).some(val => val !== "" && parseInt(val) > 0);
     
-    // MODIFICADO: Validação de campos vazios com rolagem automática para o contêiner
     if (!temDados) {
         Swal.fire({
             icon: 'info',
@@ -371,15 +393,13 @@ function encerrarContagemAgregados() {
             html: '<span class="text-amber-500 font-bold">ATENÇÃO:</span> INSIRA O VALOR NO CAMPO DA <span class="text-red-600 font-bold">"CONTAGEM DINÂMICA DE ITENS COMPLETOS"</span> PARA ADICIONÁ-LO À TABELA!',
             confirmButtonColor: '#000000',
             didClose: () => {
-                // Rola a tela suavemente até o contêiner de itens agregados
                 const container = document.getElementById('container-agregados');
                 if (container) {
                     container.scrollIntoView({
                         behavior: 'smooth',
-                        block: 'center' // Centraliza o contêiner na tela do usuário
+                        block: 'center'
                     });
                     
-                    // Adiciona um leve efeito visual de piscar para chamar a atenção do usuário
                     container.classList.add('ring-4', 'ring-red-600', 'transition-all');
                     setTimeout(() => {
                         container.classList.remove('ring-4', 'ring-amber-500');
@@ -574,32 +594,23 @@ function mostrarAlertaAviso(titulo, mensagemHTML, elementoParaFocar) {
                     // Se o erro for em um input da tabela, faz a linha inteira piscar
                     if (elementoParaFocar.tagName === 'INPUT' && elementoParaFocar.closest('tr')) {
                         elementoAlvo = elementoParaFocar.closest('tr');
-                        corBorda = 'ring-red-600';
                     } 
                     // Se o erro for em uma assinatura (Canvas)
                     else if (elementoParaFocar.tagName === 'CANVAS') {
                         elementoAlvo = elementoParaFocar.closest('.bloco-assinatura');
-                        corBorda = 'ring-red-600';
                     }
 
-                    // Remove temporariamente o contorno/sombra de foco padrão para não misturar com o azul
-                    if (elementoParaFocar.tagName === 'INPUT') {
-                        elementoParaFocar.classList.add('focus:ring-0', 'outline-none');
-                    }
-
-                    // Aplica o nosso efeito visual limpo de piscar
-                    elementoAlvo.classList.add('ring-4', corBorda, 'transition-all', 'duration-300');
-                    
-                    // Remove o efeito após 2 segundos e devolve o foco padrão do sistema
-                    setTimeout(() => {
-                        elementoAlvo.classList.remove('ring-4', corBorda);
+                    // Aplica o efeito visual de piscar de forma segura
+                    if (elementoAlvo) {
+                        elementoAlvo.classList.add('ring-4', corBorda, 'transition-all', 'duration-300');
                         
-                        if (elementoParaFocar.tagName === 'INPUT') {
-                            // Devolve as configurações originais e põe o cursor piscando no campo
-                            elementoParaFocar.classList.remove('focus:ring-0', 'outline-none');
-                            elementoParaFocar.focus({ preventScroll: true });
-                        }
-                    }, 1000);
+                        setTimeout(() => {
+                            elementoAlvo.classList.remove('ring-4', corBorda);
+                            if (elementoParaFocar.tagName === 'INPUT') {
+                                elementoParaFocar.focus({ preventScroll: true });
+                            }
+                        }, 1000);
+                    }
 
                 }, 150);
             }
@@ -630,7 +641,8 @@ function validarFormulario(acaoSucesso = null) {
         { id: 'cpf-rep', msg: 'CPF DO REPRESENTANTE' }
     ];
 
-    for (let campo of campos) {
+    for (let i = 0; i < campos.length; i++) {
+        const campo = campos[i];
         const elemento = document.getElementById(campo.id);
         if (!elemento || !elemento.value.trim()) {
             mostrarAlertaAviso('CAMPO OBRIGATÓRIO', `<span class="text-amber-500 font-bold">ATENÇÃO:</span> PREENCHA O CAMPO<br><b style="font-size:18px; color:#E53935;">"${campo.msg}"</b>!`, elemento);
@@ -659,7 +671,9 @@ function validarFormulario(acaoSucesso = null) {
     if (isCanvasEmpty('sig-agente2')) { mostrarAlertaAviso('ASSINATURA FALTANDO', '<span class="text-amber-500 font-bold">ATENÇÃO:</span> A ASSINATURA DO <br><b style="font-size:18px; color:#E53935;">"AGENTE 2"</b> É OBRIGATÓRIA!', document.getElementById('sig-agente2')); return; }
     if (isCanvasEmpty('sig-empresa')) { mostrarAlertaAviso('ASSINATURA FALTANDO', '<span class="text-amber-500 font-bold">ATENÇÃO:</span> A ASSINATURA DO <br><b style="font-size:18px; color:#e11d48;">"REPRESENTANTE DA EMPRESA"</b> É OBRIGATÓRIA!', document.getElementById('sig-empresa')); return; }
 
-    if (acaoSucesso) acaoSucesso();
+    if (typeof acaoSucesso === 'function') {
+        acaoSucesso();
+    }
 }
 
 function compartilharPDFWhatsApp() {
@@ -683,7 +697,7 @@ function compartilharPDFWhatsApp() {
         mensagem += `🏷️ *PEÇAS ETIQUETADAS:* ${etq}\n`;
         mensagem += `🚫 *PEÇAS NÃO ETIQUETADAS:* ${nEtq}\n`;
         mensagem += `📦 *ESTOQUE FÍSICO:* ${fis}\n\n`;
-        mensagem += `📊 *STATUS:* ${statusEmpresa}\n\n`;
+        // mensagem += `📊 *STATUS:* ${statusEmpresa}`;
 
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`, '_blank');
     });
@@ -776,7 +790,7 @@ function limparTabela() {
                     top: 0,
                     behavior: 'smooth'
                 });
-            }, 200); // 200 milissegundos de espera são suficientes para estabilizar a página
+            }, 200);
 	}
     });
 }
@@ -790,24 +804,20 @@ canvases.forEach(id => {
     const canvas = document.getElementById(id);
     const ctx = canvas.getContext('2d');
     
-    // Configurações iniciais do traço
     ctx.strokeStyle = '#1e293b'; 
     ctx.lineWidth = 2.5; 
     ctx.lineCap = 'round';
     
     let draw = false;
 
-    // CORREÇÃO: Ajusta as coordenadas multiplicando pelo DPR
     const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         
-        // Calcula a posição relativa dentro do elemento HTML
         const xCanvas = clientX - rect.left;
         const yCanvas = clientY - rect.top;
         
-        // Multiplica pela proporção real de pixels internos vs tamanho visual
         return { 
             x: xCanvas * (canvas.width / canvas.offsetWidth), 
             y: yCanvas * (canvas.height / canvas.offsetHeight) 
@@ -847,13 +857,11 @@ function ajustarResolucaoCanvas(id) {
     
     const dpr = window.devicePixelRatio || 1;
     
-    // Define o tamanho interno em alta resolução
     canvas.width = canvas.offsetWidth * dpr;
     canvas.height = canvas.offsetHeight * dpr;
     
-    // Garante que o traço permaneça proporcional e nítido
     ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 2.5 * dpr; // Linha engrossa proporcionalmente ao DPR
+    ctx.lineWidth = 2.5 * dpr; 
     ctx.lineCap = 'round';
 }
 
@@ -871,7 +879,6 @@ window.addEventListener('resize', () => {
 });
 
 window.onload = () => {
-    // Ajusta todos os canvases para alta definição antes de carregar os dados
     canvases.forEach(id => {
         ajustarResolucaoCanvas(id);
     });
@@ -905,7 +912,6 @@ window.onload = () => {
 
     atualizarColunas();
 
-    // Pequeno delay para garantir que os elementos renderizaram na tela
     setTimeout(() => {
         if (rascunho.sig1) restaurarAssinatura('sig-agente1', rascunho.sig1);
         if (rascunho.sig2) restaurarAssinatura('sig-agente2', rascunho.sig2);
@@ -920,7 +926,6 @@ function restaurarAssinatura(canvasId, dataUrl) {
     const img = new Image();
     img.onload = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // CORREÇÃO: Desenha a imagem preenchendo 100% da largura e altura interna ajustada
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
     img.src = dataUrl;
