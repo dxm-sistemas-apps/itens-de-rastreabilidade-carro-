@@ -216,6 +216,14 @@
                         <label class="block text-xs font-bold uppercase text-black-600 mb-1">CPF:</label>
                         <input type="text" id="cpf-rep" placeholder="000.000.000-00" maxlength="14" oninput="aplicarMascaraCPF(this)" class="w-full p-2 border border-gray-300 rounded text-sm font-mono">
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-black-600 mb-1">TELEFONE DO REPRESENTANTE:</label>
+                        <input type="text" id="tel-rep" placeholder="(00) 00000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)" class="w-full p-2 border border-gray-300 rounded text-sm font-mono">
+                    </div>
+		    <div>
+                        <label class="block text-xs font-bold uppercase text-black-600 mb-1">E-MAIL DO REPRESENTANTE:</label>
+                        <input type="text" id="e-mail-rep" placeholder="REPRESENTANTE OU EMPRESA" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                    </div>
                 </div>
                 <p class="text-center font-bold text-xs uppercase tracking-wide mt-4 pt-2 border-t border-gray-300 text-black-700">Representante da Empresa</p>
             </div>
@@ -425,8 +433,8 @@ function encerrarContagemAgregados() {
                 if (valorEtq > 0) {
                     const inputEtq = row.querySelector('.input-etiquetada');
                     if (inputEtq && !inputEtq.disabled) {
-                        const atual = parseInt(inputEtq.value) || 0;
-                        inputEtq.value = atual + valorEtq;
+                        const abrir = parseInt(inputEtq.value) || 0;
+                        inputEtq.value = abrir + valorEtq;
                         calcularLinha(inputEtq);
                         houveSoma = true;
                     }
@@ -434,8 +442,8 @@ function encerrarContagemAgregados() {
                 if (valorNEtq > 0) {
                     const inputNEtq = row.querySelector('.input-nao-etiquetada');
                     if (inputNEtq && !inputNEtq.disabled) {
-                        const atual = parseInt(inputNEtq.value) || 0;
-                        inputNEtq.value = atual + valorNEtq;
+                        const abrir = parseInt(inputNEtq.value) || 0;
+                        inputNEtq.value = abrir + valorNEtq;
                         calcularLinha(inputNEtq);
                         houveSoma = true;
                     }
@@ -582,7 +590,6 @@ function mostrarAlertaAviso(titulo, mensagemHTML, elementoParaFocar) {
         didClose: () => {
             if (elementoParaFocar) {
                 setTimeout(() => {
-                    // Centraliza o elemento de forma suave na tela
                     const elementoRect = elementoParaFocar.getBoundingClientRect();
                     const absoluteElementTop = elementoRect.top + window.pageYOffset;
                     const middleOfPosition = absoluteElementTop - (window.innerHeight / 2) + (elementoRect.height / 2);
@@ -592,16 +599,13 @@ function mostrarAlertaAviso(titulo, mensagemHTML, elementoParaFocar) {
                     let elementoAlvo = elementoParaFocar;
                     let corBorda = 'ring-red-600';
                     
-                    // Se o erro for em um input da tabela, faz a linha inteira piscar
                     if (elementoParaFocar.tagName === 'INPUT' && elementoParaFocar.closest('tr')) {
                         elementoAlvo = elementoParaFocar.closest('tr');
                     } 
-                    // Se o erro for em uma assinatura (Canvas)
                     else if (elementoParaFocar.tagName === 'CANVAS') {
                         elementoAlvo = elementoParaFocar.closest('.bloco-assinatura');
                     }
 
-                    // Aplica o efeito visual de piscar de forma segura
                     if (elementoAlvo) {
                         elementoAlvo.classList.add('ring-4', corBorda, 'transition-all', 'duration-300');
                         
@@ -631,15 +635,21 @@ function validarFormulario(acaoSucesso = null) {
     }
 
     const modoPreenchimento = document.getElementById('tipo-preenchimento').value;
+    if (!modoPreenchimento) {
+        mostrarAlertaAviso('MODO DE PREENCHIMENTO', '<span class="text-amber-500 font-bold">ATENÇÃO:</span> SELECIONE UM MODO DE PREENCHIMENTO DA TABELA!', document.getElementById('tipo-preenchimento'));
+        return;
+    }
     
     const campos = [
         { id: 'info-nome', msg: 'EMPRESA' },
-        { id: 'info-data', msg: 'DATA DA CONTAGEM' },
         { id: 'info-natureza', msg: 'NATUREZA DA FISCALIZAÇÃO' },
+        { id: 'info-data', msg: 'DATA DA CONTAGEM' },
         { id: 'mat-agente1', msg: 'ID FUNCIONAL DO AGENTE 1' },
         { id: 'mat-agente2', msg: 'ID FUNCIONAL DO AGENTE 2' },
         { id: 'nome-rep', msg: 'NOME DO REPRESENTANTE' },
-        { id: 'cpf-rep', msg: 'CPF DO REPRESENTANTE' }
+        { id: 'cpf-rep', msg: 'CPF DO REPRESENTANTE' },
+        { id: 'tel-rep', msg: 'TELEFONE DO REPRESENTANTE' },
+        { id: 'e-mail-rep', msg: 'E-MAIL DO REPRESENTANTE' }
     ];
 
     for (let i = 0; i < campos.length; i++) {
@@ -682,6 +692,7 @@ function compartilharPDFWhatsApp() {
         const nome = document.getElementById('info-nome').value.toUpperCase();
         const dataBR = document.getElementById('info-data').value.split('-').reverse().join('/');
         const natureza = document.getElementById('info-natureza').value.toUpperCase();
+        const telRep = document.getElementById('tel-rep').value;
 
         const etq = parseInt(document.getElementById('total-etiquetadas').innerText) || 0;
         const nEtq = parseInt(document.getElementById('total-nao-etiquetadas').innerText) || 0;
@@ -697,8 +708,10 @@ function compartilharPDFWhatsApp() {
         mensagem += `📅 *DATA:* ${dataBR}\n\n`;
         mensagem += `🏷️ *PEÇAS ETIQUETADAS:* ${etq}\n`;
         mensagem += `🚫 *PEÇAS NÃO ETIQUETADAS:* ${nEtq}\n`;
-        mensagem += `📦 *ESTOQUE FÍSICO:* ${fis}\n\n`;
-        mensagem += `📊 *STATUS:* ${statusEmpresa}`;
+        mensagem += `📦 *ESTOQUE FÍSICO:* ${fis}\n`;
+        mensagem += `📊 *STATUS:* ${statusEmpresa}\n\n`;
+	mensagem += `📞 *TELEFONE DO REPRESENTANTE:* ${telRep}\n`;
+	mensagem += `📧 *E-MAIL DO REPRESENTANTE:* ${emailRep}\n`;
 
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`, '_blank');
     });
@@ -727,6 +740,8 @@ function salvarProgresso() {
         mat2: document.getElementById('mat-agente2').value,
         nomeRep: document.getElementById('nome-rep').value,
         cpfRep: document.getElementById('cpf-rep').value,
+        telRep: document.getElementById('tel-rep').value,
+        emailRep: document.getElementById('e-mail-rep').value,
         tipoPreenchimento: document.getElementById('tipo-preenchimento').value,
         dadosAgregadosPorModo: dadosAgregadosPorModo,
         tabela: Array.from(document.querySelectorAll('#table-body tr')).map(r => ({
@@ -798,6 +813,12 @@ function limparTabela() {
 
 function aplicarMascaraCPF(i) { i.value = i.value.replace(/\D/g, "").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2"); }
 function aplicarMascaraMatricula(i) { i.value = i.value.replace(/\D/g, "").replace(/(\d{7})(\d{1})$/, "$1-$2"); }
+function aplicarMascaraTelefone(i) {
+    i.value = i.value.replace(/\D/g, "")
+                     .replace(/^(\d{2})(\d)/g, "($1) $2")
+                     .replace(/(\d{5})(\d)/, "$1-$2")
+                     .substring(0, 15);
+}
 
 const canvases = ['sig-agente1', 'sig-agente2', 'sig-empresa'];
 
@@ -869,7 +890,7 @@ function ajustarResolucaoCanvas(id) {
 window.addEventListener('resize', () => {
     canvases.forEach(id => {
         ajustarResolucaoCanvas(id);
-        const rascunho = localStorage.getItem('rascunho_rastreabilidade');
+        const rascunho = localStorage.getItem('raschunho_rastreabilidade');
         if(rascunho) {
             const parsed = JSON.parse(rascunho);
             if(id === 'sig-agente1' && parsed.sig1) restaurarAssinatura(id, parsed.sig1);
@@ -884,8 +905,9 @@ window.onload = () => {
         ajustarResolucaoCanvas(id);
     });
 
-    const rascunho = JSON.parse(localStorage.getItem('rascunho_rastreabilidade'));
-    if (!rascunho) return;
+    const rascunhoStr = localStorage.getItem('rascunho_rastreabilidade');
+    if (!rascunhoStr) return;
+    const rascunho = JSON.parse(rascunhoStr);
 
     document.getElementById('info-nome').value = rascunho.nome || "";
     document.getElementById('info-data').value = rascunho.data || "";
@@ -894,6 +916,8 @@ window.onload = () => {
     document.getElementById('mat-agente2').value = rascunho.mat2 || "";
     document.getElementById('nome-rep').value = rascunho.nomeRep || "";
     document.getElementById('cpf-rep').value = rascunho.cpfRep || "";
+    document.getElementById('tel-rep').value = rascunho.telRep || "";
+    document.getElementById('e-mail-rep').value = rascunho.emailRep || ""; 
     
     if(rascunho.tipoPreenchimento){
         document.getElementById('tipo-preenchimento').value = rascunho.tipoPreenchimento;
