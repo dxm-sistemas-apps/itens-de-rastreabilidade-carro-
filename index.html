@@ -6,53 +6,10 @@
     <title>ÍTENS DE RASTREABILIDADE (CARRO)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        @media print {
-            @media print { size: A4 portrait; margin: 0.5cm !important; }
-            .no-print, #barra-acoes, .btn-encerrar-container { display: none !important; }
-            body { background-color: #fff; padding-bottom: 0 !important; }
-            input:disabled { background-color: transparent !important; border: none !important; }
-            tfoot { display: table-row-group !important; }
-            #table-body tr td { padding-top: 3px !important; padding-bottom: 3px !important; font-size: 12px !important; }
-            thead th { padding: 6px !important; font-size: 13px !important; }
-            tr { page-break-inside: avoid; }
-            .bloco-signature-container { margin-top: 10px !important; padding-top: 10px !important; }
-            .bloco-assinatura { page-break-inside: avoid !important; padding: 10px !important; font-size: 12px !important; }
-            canvas { height: 130px !important; }
-            #bloco-agentes-detran { page-break-inside: avoid !important; }
-            .container-agregados-classe { display: none !important; }
-
-            /* Alterações solicitadas para o PDF/Impressão */
-            .bloco-signature-container {
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                gap: 16px !important;
-            }
-            #bloco-agentes-detran {
-                display: flex !important;
-                flex-direction: row !important;
-                justify-content: center !important;
-                width: 100% !important;
-                gap: 16px !important;
-            }
-            #bloco-agentes-detran .bloco-assinatura {
-                flex: 1 !important;
-                max-width: 48% !important;
-            }
-            #bloco-representante-empresa {
-                width: 50% !important;
-                margin: 0 auto !important;
-            }
-        }
+<style>
+        /* CSS unificado para telas */
         canvas { touch-action: none; }
         input { text-transform: uppercase; }
-        @media print {
-            input:disabled { background-color: #f3f4f6 !important; border: 1px solid #d1d5db !important; }
-            button { display: none !important; }
-            canvas { pointer-events: none !important; } 
-        }
-
         .assinatura-ativa {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='black' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/></svg>") 0 32, auto !important;
         }
@@ -62,6 +19,89 @@
         }
         table td {
             color: #000000 !important;
+        }
+
+        /* Regras estritas corrigidas exclusivamente para Impressão/PDF */
+        @media print {
+            @page { 
+                size: A4 portrait; 
+                margin: 0.8cm !important; 
+            }
+            body { 
+                background-color: #fff !important; 
+                padding-bottom: 0 !important; 
+            }
+            .no-print, #barra-acoes, .btn-encerrar-container, button, .container-agregados-classe { 
+                display: none !important; 
+            }
+            input:disabled, input { 
+                background-color: #f3f4f6 !important; 
+                border: 1px solid #d1d5db !important; 
+            }
+            tfoot { 
+                display: table-row-group !important; 
+            }
+            #table-body tr td { 
+                padding-top: 3px !important; 
+                padding-bottom: 3px !important; 
+                font-size: 12px !important; 
+            }
+            thead th { 
+                padding: 6px !important; 
+                font-size: 13px !important; 
+            }
+            tr { 
+                page-break-inside: avoid !important; 
+            }
+            canvas { 
+                height: 130px !important; 
+                pointer-events: none !important; 
+            }
+
+            /* Força o container pai das assinaturas a aparecer estruturado no mobile */
+            .bloco-signature-container {
+                display: block !important;
+                width: 100% !important;
+                margin-top: 20px !important;
+                padding-top: 15px !important;
+                page-break-inside: avoid !important;
+            }
+            
+            /* Organiza o bloco dos agentes em formato tabular (Lado a lado de forma segura) */
+            #bloco-agentes-detran {
+                display: table !important;
+                width: 100% !important;
+                table-layout: fixed !important;
+                margin-bottom: 15px !important;
+                gap: 0 !important; /* Desativa gap do flex */
+            }
+            
+            /* Transforma cada bloco de agente em uma célula da tabela */
+            #bloco-agentes-detran .bloco-assinatura {
+                display: table-cell !important;
+                width: 50% !important;
+                padding: 10px !important;
+                vertical-align: top !important;
+                border: 1px solid #e5e7eb !important;
+                background-color: #f9fafb !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* Cria um espaçamento visual seguro entre as duas assinaturas */
+            #bloco-agentes-detran .bloco-assinatura:first-child {
+                border-right: 12px solid #ffffff !important;
+            }
+
+            /* Bloco do representante centralizado abaixo */
+            #bloco-representante-empresa {
+                display: block !important;
+                width: 60% !important;
+                margin: 10px auto 0 auto !important;
+                padding: 10px !important;
+                border: 1px solid #e5e7eb !important;
+                background-color: #f9fafb !important;
+                page-break-inside: avoid !important;
+            }
         }
     </style>
 </head>
@@ -214,11 +254,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-black-600 mb-1">CPF:</label>
-                        <input type="text" id="cpf-rep" placeholder="000.000.000-00" maxlength="14" oninput="aplicarMascaraCPF(this)" class="w-full p-2 border border-gray-300 rounded text-sm font-mono">
+                        <input type="text" id="cpf-rep" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" oninput="aplicarMascaraCPF(this)" class="w-full p-2 border border-gray-300 rounded text-sm font-mono">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-black-600 mb-1">TELEFONE DO REPRESENTANTE:</label>
-                        <input type="text" id="tel-rep" placeholder="(00) 00000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)" class="w-full p-2 border border-gray-300 rounded text-sm font-mono">
+                        <input type="tel" id="tel-rep" inputmode="numeric" placeholder="(00) 00000-0000" maxlength="15" oninput="aplicarMascaraTelefone(this)" class="w-full p-2 border border-gray-300 rounded text-sm font-mono">
                     </div>
 		    <div>
                         <label class="block text-xs font-bold uppercase text-black-600 mb-1">E-MAIL DO REPRESENTANTE:</label>
@@ -765,10 +805,23 @@ function limparTabela() {
         confirmButtonColor: '#d33',
         cancelButtonColor: '#000000',
         confirmButtonText: 'OK',
-        cancelButtonText: 'CANCELAR'
+        cancelButtonText: 'CANCELAR',
+        // CORREÇÃO SMARTPHONE: Garante que a página role para o topo somente APÓS o alerta fechar completamente
+        didClose: () => {
+            if (window.foiConfirmadoLimpar) {
+                window.foiConfirmadoLimpar = false;
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            }
+        }
     }).then((result) => {
         if (result.isConfirmed) {
             window.isClearing = true;
+            window.foiConfirmadoLimpar = true; // Sinaliza que a limpeza foi aceita
             localStorage.removeItem('rascunho_rastreabilidade');
             
             dadosAgregadosPorModo = {
@@ -801,14 +854,7 @@ function limparTabela() {
             
             atualizarColunas();
             window.isClearing = false;
-
-	    setTimeout(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }, 200);
-	}
+        }
     });
 }
 
