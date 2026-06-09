@@ -693,7 +693,7 @@ function compartilharPDFWhatsApp() {
         const dataBR = document.getElementById('info-data').value.split('-').reverse().join('/');
         const natureza = document.getElementById('info-natureza').value.toUpperCase();
         const telRep = document.getElementById('tel-rep').value;
-	const emailRep = document.getElementById('e-mail-rep').value;
+	const emailRep = document.getElementById('e-mail-rep').value.toUpperCase();
 	
 	const etq = parseInt(document.getElementById('total-etiquetadas').innerText) || 0;
         const nEtq = parseInt(document.getElementById('total-nao-etiquetadas').innerText) || 0;
@@ -880,24 +880,28 @@ function ajustarResolucaoCanvas(id) {
     
     const dpr = window.devicePixelRatio || 1;
     
+    // CORREÇÃO SMARTPHONE: Armazena o desenho antigo antes de mudar a resolução interna
+    let tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    let tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(canvas, 0, 0);
+
     canvas.width = canvas.offsetWidth * dpr;
     canvas.height = canvas.offsetHeight * dpr;
     
     ctx.strokeStyle = '#1e293b';
     ctx.lineWidth = 2.5 * dpr; 
     ctx.lineCap = 'round';
+
+    // Restaura o desenho antigo escalando perfeitamente para o novo tamanho
+    ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, canvas.width, canvas.height);
 }
 
+// CORREÇÃO SMARTPHONE: Ajustado o listener para não resetar o rascunho inteiro com o redimensionamento nativo do mobile
 window.addEventListener('resize', () => {
     canvases.forEach(id => {
         ajustarResolucaoCanvas(id);
-        const rascunho = localStorage.getItem('raschunho_rastreabilidade');
-        if(rascunho) {
-            const parsed = JSON.parse(rascunho);
-            if(id === 'sig-agente1' && parsed.sig1) restaurarAssinatura(id, parsed.sig1);
-            if(id === 'sig-agente2' && parsed.sig2) restaurarAssinatura(id, parsed.sig2);
-            if(id === 'sig-empresa' && parsed.sig3) restaurarAssinatura(id, parsed.sig3);
-        }
     });
 });
 
@@ -906,9 +910,8 @@ window.onload = () => {
         ajustarResolucaoCanvas(id);
     });
 
-    const rascunhoStr = localStorage.getItem('rascunho_rastreabilidade');
-    if (!rascunhoStr) return;
-    const rascunho = JSON.parse(rascunhoStr);
+    const rascunho = JSON.parse(localStorage.getItem('rascunho_rastreabilidade'));
+    if (!rascunho) return;
 
     document.getElementById('info-nome').value = rascunho.nome || "";
     document.getElementById('info-data').value = rascunho.data || "";
@@ -917,7 +920,7 @@ window.onload = () => {
     document.getElementById('mat-agente2').value = rascunho.mat2 || "";
     document.getElementById('nome-rep').value = rascunho.nomeRep || "";
     document.getElementById('cpf-rep').value = rascunho.cpfRep || "";
-    document.getElementById('tel-rep').value = rascunho.telRep || "";
+    /* CORREÇÃO: Buscando a propriedade correta ajustada em salvarProgresso */
     document.getElementById('e-mail-rep').value = rascunho.emailRep || ""; 
     
     if(rascunho.tipoPreenchimento){
