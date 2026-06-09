@@ -693,8 +693,9 @@ function compartilharPDFWhatsApp() {
         const dataBR = document.getElementById('info-data').value.split('-').reverse().join('/');
         const natureza = document.getElementById('info-natureza').value.toUpperCase();
         const telRep = document.getElementById('tel-rep').value;
-
-        const etq = parseInt(document.getElementById('total-etiquetadas').innerText) || 0;
+	const emailRep = document.getElementById('e-mail-rep').value;
+	
+	const etq = parseInt(document.getElementById('total-etiquetadas').innerText) || 0;
         const nEtq = parseInt(document.getElementById('total-nao-etiquetadas').innerText) || 0;
         const fis = document.getElementById('total-est-fisico').innerText;
 
@@ -711,7 +712,7 @@ function compartilharPDFWhatsApp() {
         mensagem += `📦 *ESTOQUE FÍSICO:* ${fis}\n`;
         mensagem += `📊 *STATUS:* ${statusEmpresa}\n\n`;
 	mensagem += `📞 *TELEFONE DO REPRESENTANTE:* ${telRep}\n`;
-	mensagem += `📧 *E-MAIL DO REPRESENTANTE:* ${emailRep}\n`;
+	mensagem += `📧 *E-MAIL DO REPRESENTANTE:* ${emailRep}`;
 
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`, '_blank');
     });
