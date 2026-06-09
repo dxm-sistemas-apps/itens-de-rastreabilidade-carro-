@@ -635,7 +635,7 @@ function validarFormulario(acaoSucesso = null) {
     const campos = [
         { id: 'info-nome', msg: 'EMPRESA' },
         { id: 'info-data', msg: 'DATA DA CONTAGEM' },
-        { id: 'info-natureza', msg: 'NATUREZA DA ATIVIDADE' },
+        { id: 'info-natureza', msg: 'NATUREZA DA FISCALIZAÇÃO' },
         { id: 'mat-agente1', msg: 'ID FUNCIONAL DO AGENTE 1' },
         { id: 'mat-agente2', msg: 'ID FUNCIONAL DO AGENTE 2' },
         { id: 'nome-rep', msg: 'NOME DO REPRESENTANTE' },
@@ -693,7 +693,7 @@ function compartilharPDFWhatsApp() {
 
         let mensagem = `*ITENS DE RASTREABILIDADE - CARRO*\n\n`;
         mensagem += `🏢 *EMPRESA:* ${nome}\n`;
-        mensagem += `🧐 *ATIVIDADE:* ${natureza}\n`;
+        mensagem += `🧐 *FISCALIZAÇÃO:* ${natureza}\n`;
         mensagem += `📅 *DATA:* ${dataBR}\n\n`;
         mensagem += `🏷️ *PEÇAS ETIQUETADAS:* ${etq}\n`;
         mensagem += `🚫 *PEÇAS NÃO ETIQUETADAS:* ${nEtq}\n`;
