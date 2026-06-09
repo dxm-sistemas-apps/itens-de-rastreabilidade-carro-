@@ -87,14 +87,15 @@
                 <label class="block text-xs font-bold uppercase text-black-600 mb-1">Empresa:</label>
                 <input type="text" id="info-nome" placeholder="RAZÃO SOCIAL / NOME FANTASIA" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-black focus:outline-none text-sm uppercase">
             </div>
-            <div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase text-black-600 mb-1">Natureza da Fiscalização:</label>
+                <input type="text" id="info-natureza" placeholder="MOTIVO DA VISITA" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-black focus:outline-none text-sm uppercase">
+            </div>
+	    <div>
                 <label class="block text-xs font-bold uppercase text-black-600 mb-1">Data:</label>
                 <input type="date" id="info-data" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-black focus:outline-none text-sm">
             </div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold uppercase text-black-600 mb-1">Natureza da Atividade:</label>
-                <input type="text" id="info-natureza" placeholder="MOTIVO DA VISITA" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-black focus:outline-none text-sm uppercase">
-            </div>
+            
         </section>
 
         <div class="text-center my-6">
@@ -697,7 +698,7 @@ function compartilharPDFWhatsApp() {
         mensagem += `🏷️ *PEÇAS ETIQUETADAS:* ${etq}\n`;
         mensagem += `🚫 *PEÇAS NÃO ETIQUETADAS:* ${nEtq}\n`;
         mensagem += `📦 *ESTOQUE FÍSICO:* ${fis}\n\n`;
-        // mensagem += `📊 *STATUS:* ${statusEmpresa}`;
+        mensagem += `📊 *STATUS:* ${statusEmpresa}`;
 
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`, '_blank');
     });
